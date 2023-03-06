@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  db-manager-pgweb:
+    container_name: pgweb_app
+    image: sosedoff/pgweb
+    ports:
+      - '8081:8081'
+    networks:
+      - pgweb-app-network
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        /usr/bin/pgweb --bind=0.0.0.0 --listen=8081 --sessions --skip-open
+
+networks:
+  pgweb-app-network:

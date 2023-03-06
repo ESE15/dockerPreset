@@ -1,0 +1,38 @@
+local function stringSplit(src, delimiter)
+    local result = { }
+    local from = 1
+    local delim_from, delim_to = string.find( src, delimiter, from )
+    while delim_from do
+      table.insert( result, string.sub( src, from , delim_from-1 ) )
+      from = delim_to + 1
+      delim_from, delim_to = string.find( src, delimiter, from )
+    end
+    table.insert( result, string.sub( src, from ))
+    return result
+end
+
+local function extractValueFromKey(src, opt)
+    local sIdx, eIdx = string.find(src, opt..':%S+')
+    local subString = string.sub(src, sIdx, eIdx)
+    return stringSplit(subString, ':')[2]
+end
+
+local function parseInt(txt)
+    local str = ""
+    string.gsub(txt,"%d+",
+    function(e)
+        str = str .. e
+    end
+    )
+    return str;
+end
+
+local result = {}
+local r = redis.call('info', 'server')
+
+-- run_id 구하기
+local runId = extractValueFromKey(r, 'run_id');
+table.insert(result, 'custom_run_id')
+table.insert(result, parseInt(runId))
+
+return result

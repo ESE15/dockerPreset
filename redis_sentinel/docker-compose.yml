@@ -1,0 +1,113 @@
+version: '3.9'
+services:
+  redis-master:
+    hostname: redis-master
+    network_mode: host
+    container_name: redis-master
+    image: redis:6.2
+    command: >
+      docker-entrypoint.sh
+      --port 6379
+      --maxmemory 200000000
+    ports:
+      - 6379:6379
+
+  redis-slave1:
+    hostname: redis-slave1
+    network_mode: host
+    container_name: redis-slave1
+    image: redis:6.2
+    command: >
+      docker-entrypoint.sh
+      --port 6380
+      --maxmemory 200000000
+      --replicaof localhost 6379
+    ports:
+      - 6380:6380
+    depends_on:
+      - redis-master
+
+  redis-slave2:
+    hostname: redis-slave2
+    network_mode: host
+    container_name: redis-slave2
+    image: redis:6.2
+    command: >
+      docker-entrypoint.sh
+      --port 6381
+      --maxmemory 200000000
+      --replicaof localhost 6379
+    ports:
+      - 6381:6381
+    depends_on:
+      - redis-master
+      - redis-slave1
+
+  redis-sentinel1:
+    image: lgatica/redis-sentinel:4.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: "host"
+    environment:
+      - REQUIREPASS=password1234
+      - MASTERPORT=6379
+      - CLIENTPORT=26379
+      - MASTERHOST=127.0.0.1
+      - CLIENTHOST=127.0.0.1
+      - QUORUM=2
+      - DOWN_AFTER_MILLISEC=5000
+      - FAILOVER_TIMEOUT=30000
+    volumes:
+      - "./sentinel-data/sentinel1:/redis"
+    restart: always
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  redis-sentinel2:
+    image: lgatica/redis-sentinel:4.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: "host"
+    environment:
+      - REQUIREPASS=password1234
+      - MASTERPORT=6379
+      - CLIENTPORT=26380
+      - MASTERHOST=127.0.0.1
+      - CLIENTHOST=127.0.0.1
+      - QUORUM=2
+      - DOWN_AFTER_MILLISEC=5000
+      - FAILOVER_TIMEOUT=30000
+    volumes:
+      - "./sentinel-data/sentinel2:/redis"
+    restart: always
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+
+  redis-sentinel3:
+    image: lgatica/redis-sentinel:4.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    network_mode: "host"
+    environment:
+      - REQUIREPASS=password1234
+      - MASTERPORT=6379
+      - CLIENTPORT=26381
+      - MASTERHOST=127.0.0.1
+      - CLIENTHOST=127.0.0.1
+      - QUORUM=2
+      - DOWN_AFTER_MILLISEC=5000
+      - FAILOVER_TIMEOUT=30000
+    volumes:
+      - "./sentinel-data/sentinel3:/redis"
+    restart: always
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2

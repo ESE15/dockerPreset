@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+    redis:
+      image: redislabs/rejson:latest
+      container_name: rejson
+      #network_mode: host
+      hostname: redis
+      labels:
+        - "name=redis"
+        - "mode=standalone"
+      ports:
+        - 6379:6379
+      volumes:
+        - ~/dockerPreset/rejsonData:/data
+      mem_limit: "200m" 
+      networks:
+        - rejson_local
+      command: >
+        docker-entrypoint.sh
+        --loadmodule /usr/lib/redis/modules/rejson.so
+        --maxmemory 200000000
+
+networks:
+  rejson_local:

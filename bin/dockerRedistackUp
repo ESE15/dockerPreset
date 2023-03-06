@@ -1,0 +1,12 @@
+#!/usr/bin/zsh
+
+## Dependences
+DEPENDENCES=("docker")
+for package in ${DEPENDENCES[@]}; do
+    if ! (hash $package 2>/dev/null); then
+        echo "$package not found"
+        exit 1
+    fi
+done
+
+docker compose -f ~/dockerPreset/redis/docker-compose-redistack.yml up -d

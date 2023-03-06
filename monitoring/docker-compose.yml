@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  grafana:
+    extends:
+      file: ./grafana/docker-compose.yml
+      service: grafana
+  redis-exporter:
+    extends:
+      file: ./prometheus/docker-compose.yml
+      service: redis-exporter
+  prometheus:
+    extends:
+      file: ./prometheus/docker-compose.yml
+      service: prometheus
+volumes:
+  grafana-storage:
+  prometheus_data:

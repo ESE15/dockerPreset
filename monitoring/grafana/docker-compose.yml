@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  grafana:
+    container_name: grafana-monitor
+    image: grafana/grafana:9.3.4
+    network_mode: host
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_ENABLE_GZIP=true
+      # To enable light theme
+      #- GF_USERS_DEFAULT_THEME=light
+      # Uncomment to run in debug mode
+      #- GF_LOG_LEVEL=debug
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    user: "$UID:$GID"
+
+volumes:
+  grafana-storage:

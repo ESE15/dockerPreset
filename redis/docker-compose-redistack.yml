@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+    redis:
+      image: redis/redis-stack
+      container_name: redistack
+      #network_mode: host
+      labels:
+        - "name=redis"
+        - "mode=standalone"
+      ports:
+        - 6379:6379
+        - 13333:8001
+      volumes:
+        - ~/dockerPreset/redistackData:/data
+      mem_limit: "200m"
+      networks:
+        - redistack_local
+      command: >
+        ./entrypoint.sh
+        --maxmemory 200000000
+
+networks:
+  redistack_local:

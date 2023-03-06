@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  redis-node1:
+    image: redis:6.2
+    container_name: redis-node1
+    network_mode: host
+    volumes:
+      - ./redisClusterData:/data
+      - ./redis-6379c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6379:6379
+
+  redis-node2:
+    image: redis:6.2
+    container_name: redis-node2
+    network_mode: host
+    volumes:
+      - ./redis-6380c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6380:6380
+
+  redis-node3:
+    image: redis:6.2
+    container_name: redis-node3
+    network_mode: host
+    volumes:
+      - ./redis-6381c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6381:6381
+
+  redis-node4:
+    image: redis:6.2
+    container_name: redis-node4
+    network_mode: host
+    volumes:
+      - ./redis-6382c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6382:6382
+
+
+  redis-node5:
+    image: redis:6.2
+    container_name: redis-node5
+    network_mode: host
+    volumes:
+      - ./redis-6383c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6383:6383
+
+  redis-node6:
+    image: redis:6.2
+    container_name: redis-node6
+    network_mode: host
+    volumes:
+      - ./redis-6384c.conf:/usr/local/etc/redis.conf
+    command: redis-server /usr/local/etc/redis.conf
+    ports:
+      - 6384:6384
+
+  redis-cluster-entry:
+    network_mode: host
+    image: redis:6.2
+    container_name: redis-cluster-entry
+    entrypoint: ["/bin/bash", "-c"]
+    command: 
+      - |
+        redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-yes
+        redis-cli --cluster add-node 127.0.0.1:6382 127.0.0.1:6379 --cluster-slave
+        redis-cli --cluster add-node 127.0.0.1:6383 127.0.0.1:6380 --cluster-slave
+        redis-cli --cluster add-node 127.0.0.1:6384 127.0.0.1:6381 --cluster-slave
+
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
