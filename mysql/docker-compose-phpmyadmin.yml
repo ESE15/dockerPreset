@@ -7,7 +7,7 @@ services:
     ports:
       - 5051:80
     volumes:
-      - ~/dockerPreset/phpmyadminData/config.user.inc.php:/etc/phpmyadmin/config/config.user.inc.php
+      - ~/dockerPreset/volumes/phpmyadminData/config.user.inc.php:/etc/phpmyadmin/config/config.user.inc.php
     environment:
       - PMA_HOSTS=${PMA_HOSTS}
       - PMA_PORT=3306
