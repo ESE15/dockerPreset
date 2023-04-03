@@ -11,7 +11,7 @@ services:
         - 6379:6379
         - 13333:8001
       volumes:
-        - ~/dockerPreset/redistackData:/data
+        - ~/dockerPreset/volumes/redistackData:/data
       mem_limit: "200m"
       networks:
         - redistack_local

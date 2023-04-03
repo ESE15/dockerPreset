@@ -11,7 +11,7 @@ services:
       ports:
         - 6379:6379
       volumes:
-        - ~/dockerPreset/rejsonData:/data
+        - ~/dockerPreset/volumes/rejsonData:/data
       mem_limit: "200m" 
       networks:
         - rejson_local
