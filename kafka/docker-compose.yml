@@ -24,11 +24,10 @@ services:
       KAFKA_CFG_MAX_PARTITION_FETCH_BYTES: 1048576
       KAFKA_CFG_MAX_REQUEST_SIZE: 1048576
       KAFKA_CFG_BROKER_ID: 1
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_CFG_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_CFG_ADVERTISED_HOST_NAME: kafka
       KAFKA_CFG_ADVERTISED_PORT: 9092
-
     volumes:
       - "kafka_data:/bitnami"
       #- ~/dockerPreset/volumes/kafka-persistence:/bitnami/kafka
@@ -40,19 +39,13 @@ services:
       - kafka_net
 
   kafka-ui:
-    image: provectuslabs/kafka-ui:master
-    container_name: kafka-ui
-    ports:
-      - "8989:8080"
-    depends_on:
-      - kafka
-      - zookeeper
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui-nhost
+    network_mode: host
     environment:
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-    networks:
-      - kafka_net
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: localhost:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: localhost:2181
 
 networks:
   kafka_net:
