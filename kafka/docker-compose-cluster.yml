@@ -1,0 +1,127 @@
+version: "3.2"
+
+services:
+  zookeeper-cluster:
+    image: docker.io/bitnami/zookeeper:3.8
+    container_name: zookeeper_cluster
+    tmpfs: "/datalog"
+    volumes:
+      - "zookeeper_cluster_data:/bitnami"
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka-1:
+    image: docker.io/bitnami/kafka:2.8.1
+    container_name: kafka-1
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper-cluster:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_INTER_BROKER_USER: user
+      KAFKA_INTER_BROKER_PASSWORD: bitnami
+      KAFKA_CFG_MAX_PARTITION_FETCH_BYTES: 1048576
+      KAFKA_CFG_MAX_REQUEST_SIZE: 1048576
+      KAFKA_CFG_BROKER_ID: 1
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:19092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_CFG_LISTENERS: PLAINTEXT://kafka-1:19092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CFG_ADVERTISED_HOST_NAME: kafka-1
+      KAFKA_CFG_ADVERTISED_PORT: 9092
+    volumes:
+      - "kafka1_data:/bitnami"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper-cluster
+
+  kafka-2:
+    image: docker.io/bitnami/kafka:2.8.1
+    container_name: kafka-2
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper-cluster:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_INTER_BROKER_USER: user
+      KAFKA_INTER_BROKER_PASSWORD: bitnami
+      KAFKA_CFG_MAX_PARTITION_FETCH_BYTES: 1048576
+      KAFKA_CFG_MAX_REQUEST_SIZE: 1048576
+      KAFKA_CFG_BROKER_ID: 2
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:19092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_CFG_LISTENERS: PLAINTEXT://kafka-2:19092,PLAINTEXT_HOST://0.0.0.0:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CFG_ADVERTISED_HOST_NAME: kafka-2
+      KAFKA_CFG_ADVERTISED_PORT: 9093
+    volumes:
+      - "kafka2_data:/bitnami"
+    ports:
+      - "9093:9093"
+    depends_on:
+      - zookeeper-cluster
+      - kafka-1
+
+  kafka-3:
+    image: docker.io/bitnami/kafka:2.8.1
+    container_name: kafka-3
+    environment:
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper-cluster:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_INTER_BROKER_USER: user
+      KAFKA_INTER_BROKER_PASSWORD: bitnami
+      KAFKA_CFG_MAX_PARTITION_FETCH_BYTES: 1048576
+      KAFKA_CFG_MAX_REQUEST_SIZE: 1048576
+      KAFKA_CFG_BROKER_ID: 3
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:19092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_CFG_LISTENERS: PLAINTEXT://kafka-3:19092,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CFG_ADVERTISED_HOST_NAME: kafka-3
+      KAFKA_CFG_ADVERTISED_PORT: 9094
+    volumes:
+      - "kafka3_data:/bitnami"
+    ports:
+      - "9094:9094"
+    depends_on:
+      - zookeeper-cluster
+      - kafka-1
+      - kafka-2
+  
+
+  kafka-ui-cluster:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui-cluster-host
+    ports:
+      - 8080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:19092,kafka-2:19092,kafka-3:19092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper-cluster:2181
+    depends_on:
+      - zookeeper-cluster
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+  kafka-cluster-init-topics:
+    image: docker.io/bitnami/kafka:2.8.1
+    depends_on:
+      - zookeeper-cluster
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - kafka-ui-cluster
+    command: "bash -c 'sleep 10 && \
+                kafka-topics.sh --create --topic Errors --partitions 1 --replication-factor 3 --if-not-exists --bootstrap-server kafka-1:19092 && \
+                kafka-topics.sh --create --topic GameProc --partitions 1 --replication-factor 3 --if-not-exists --bootstrap-server kafka-1:19092 && \
+                kafka-topics.sh --create --topic UniversalProc --partitions 1 --replication-factor 3 --if-not-exists --bootstrap-server kafka-1:19092'"
+
+volumes:
+  zookeeper_cluster_data:
+    driver: local
+  kafka1_data:
+    driver: local
+  kafka2_data:
+    driver: local
+  kafka3_data:
+    driver: local
