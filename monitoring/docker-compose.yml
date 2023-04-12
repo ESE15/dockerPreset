@@ -8,6 +8,10 @@ services:
     extends:
       file: ./prometheus/docker-compose.yml
       service: redis-exporter
+  mysql-exporter:
+    extends:
+      file: ./prometheus/docker-compose.yml
+      service: mysql-exporter      
   prometheus:
     extends:
       file: ./prometheus/docker-compose.yml

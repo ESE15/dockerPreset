@@ -9,4 +9,4 @@ for package in ${DEPENDENCES[@]}; do
     fi
 done
 
-docker compose -f ~/dockerPreset/kafka/docker-compose.yml up -d
+docker compose -f ~/dockerPreset/kafka/docker-compose-cluster.yml up -d

@@ -3,7 +3,6 @@ services:
   redis-exporter:
     image: oliver006/redis_exporter
     container_name: redis_exporter_svc
-    network_mode: host
     ports:
       - '9121:9121'
     volumes:
@@ -11,11 +10,18 @@ services:
     entrypoint:  ["/redis_exporter"]
     command: >
       --script /scripts/export_run_id.lua
+  
+  mysql-exporter:
+    image: prom/mysqld-exporter
+    container_name: mysql_exporter_svc
+    ports: 
+      - '9104:9104'
+    environment:
+      - "DATA_SOURCE_NAME=user:pwd@(dburl:3306)/dbname"
 
   prometheus:
     image: prom/prometheus:v2.41.0
     container_name: prometheus_db
-    network_mode: host
     ports:
       - '9090:9090'
     command:

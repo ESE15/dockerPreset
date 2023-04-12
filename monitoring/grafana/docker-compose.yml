@@ -3,7 +3,6 @@ services:
   grafana:
     container_name: grafana-monitor
     image: grafana/grafana:9.3.4
-    network_mode: host
     ports:
       - "3000:3000"
     environment:
