@@ -24,6 +24,8 @@ services:
       - ./redis-6380c.conf:/usr/local/etc/redis.conf
       - ./rejson.so:/usr/lib/redis/modules/rejson.so
     command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    depends_on:
+      - redis-node1
     ports:
       - 6380:6380
     networks:
@@ -38,6 +40,9 @@ services:
       - ./redis-6381c.conf:/usr/local/etc/redis.conf
       - ./rejson.so:/usr/lib/redis/modules/rejson.so
     command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    depends_on:
+      - redis-node1
+      - redis-node2
     ports:
       - 6381:6381
     networks:
@@ -53,6 +58,10 @@ services:
       - ./redis-6382c.conf:/usr/local/etc/redis.conf
       - ./rejson.so:/usr/lib/redis/modules/rejson.so
     command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
     ports:
       - 6382:6382
     networks:
@@ -68,6 +77,11 @@ services:
       - ./redis-6383c.conf:/usr/local/etc/redis.conf
       - ./rejson.so:/usr/lib/redis/modules/rejson.so
     command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
     ports:
       - 6383:6383
     networks:
@@ -82,6 +96,12 @@ services:
       - ./redis-6384c.conf:/usr/local/etc/redis.conf
       - ./rejson.so:/usr/lib/redis/modules/rejson.so
     command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
     ports:
       - 6384:6384
     networks:
