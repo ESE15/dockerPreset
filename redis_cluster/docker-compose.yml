@@ -2,71 +2,103 @@ version: "3.9"
 
 services:
   redis-node1:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node1
+    hostname: redis-node1
     volumes:
-      - ~/dockerPreset/volumes/redisClusterData:/data
+      - redis-cluster-1-data:/data
       - ./redis-6379c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6379:6379
+    networks:
+      - redis_cluster_network
 
   redis-node2:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node2
+    hostname: redis-node2
     volumes:
+      - redis-cluster-2-data:/data
       - ./redis-6380c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6380:6380
+    networks:
+      - redis_cluster_network      
 
   redis-node3:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node3
+    hostname: redis-node3
     volumes:
+      - redis-cluster-3-data:/data
       - ./redis-6381c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6381:6381
+    networks:
+      - redis_cluster_network
+      
 
   redis-node4:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node4
+    hostname: redis-node4
     volumes:
+      - redis-cluster-4-data:/data
       - ./redis-6382c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6382:6382
+    networks:
+      - redis_cluster_network      
 
 
   redis-node5:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node5
+    hostname: redis-node5
     volumes:
+      - redis-cluster-5-data:/data
       - ./redis-6383c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6383:6383
+    networks:
+      - redis_cluster_network      
 
   redis-node6:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-node6
+    hostname: redis-node6
     volumes:
+      - redis-cluster-6-data:/data
       - ./redis-6384c.conf:/usr/local/etc/redis.conf
-    command: redis-server /usr/local/etc/redis.conf
+      - ./rejson.so:/usr/lib/redis/modules/rejson.so
+    command: redis-server /usr/local/etc/redis.conf --loadmodule /usr/lib/redis/modules/rejson.so
     ports:
       - 6384:6384
+    networks:
+      - redis_cluster_network      
 
   redis-cluster-entry:
-    image: redis:6.2
+    image: redis:7.0
     container_name: redis-cluster-entry
     entrypoint: ["/bin/bash", "-c"]
+    networks:
+      - redis_cluster_network    
     command: 
       - |
-        redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-yes
-        redis-cli --cluster add-node 127.0.0.1:6382 127.0.0.1:6379 --cluster-slave
-        redis-cli --cluster add-node 127.0.0.1:6383 127.0.0.1:6380 --cluster-slave
-        redis-cli --cluster add-node 127.0.0.1:6384 127.0.0.1:6381 --cluster-slave
+        redis-cli --cluster create redis-node1:6379 redis-node2:6380 redis-node3:6381 --cluster-yes
+        redis-cli --cluster add-node redis-node4:6382 redis-node1:6379 --cluster-slave
+        redis-cli --cluster add-node redis-node5:6383 redis-node2:6380 --cluster-slave
+        redis-cli --cluster add-node redis-node6:6384 redis-node3:6381 --cluster-slave
 
     depends_on:
       - redis-node1
@@ -75,3 +107,14 @@ services:
       - redis-node4
       - redis-node5
       - redis-node6
+
+networks:
+  redis_cluster_network:
+  
+volumes:
+  redis-cluster-1-data:
+  redis-cluster-2-data:
+  redis-cluster-3-data:
+  redis-cluster-4-data:
+  redis-cluster-5-data:
+  redis-cluster-6-data:
